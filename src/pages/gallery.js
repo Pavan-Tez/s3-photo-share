@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 25;
 
 export default function Gallery() {
   const router = useRouter();
-  const  prefix  = router.query;
+  const { prefix } = router.query;
 
   const [files, setFiles] = useState([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const loaderRef = useRef(null);
 
   useEffect(() => {
-    if (!prefix) return;
+    if (!router.isReady || !prefix) return;
 
     fetch(`/api/images?prefix=${prefix}`)
       .then(res => res.json())
@@ -50,18 +50,27 @@ export default function Gallery() {
       >
 {files.slice(0, visibleCount).map((file, idx) => (
   <a
-    key={idx}
+    key={file.name}
     href={file.fullUrl}
     target="_blank"
     rel="noopener noreferrer"
   >
     <img
-      src={file.thumbUrl}
+      src={file.thumbUrl || file.fullUrl}
       alt={file.name}
       loading="lazy"
       decoding="async"
       className="blur-img"
       onLoad={(e) => e.currentTarget.classList.add("loaded")}
+      onError={(e) => {
+    // fallback to full image if thumb failed
+    if (e.currentTarget.src !== file.fullUrl) {
+      e.currentTarget.src = file.fullUrl;
+    } else {
+      // remove skeleton even if image totally fails
+      e.currentTarget.classList.add("loaded");
+    }
+  }}
       style={{
         width: "250px",
         height: "180px",

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   const [files, setFiles] = useState([]);
-  const prefix = "photos/";
+  const prefix = "beachPhotos/";
   const [downloading, setDownloading] = useState(false);
   useEffect(() => {
     fetch(`/api/images?prefix=${prefix}`)

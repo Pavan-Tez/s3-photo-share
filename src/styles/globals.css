@@ -1,11 +1,13 @@
+@import "tailwindcss";
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ededed;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #000000;
     --foreground: #ededed;
   }
 }
@@ -42,15 +44,19 @@ a {
 }
 
 
+/* Progressive blur loading */
 .blur-img {
   background: linear-gradient(
     90deg,
-    #eee 25%,
-    #f5f5f5 37%,
-    #eee 63%
+    #1a1a1a 25%,
+    #2a2a2a 37%,
+    #1a1a1a 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
+  filter: blur(20px);
+  transform: scale(1.1);
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 @keyframes shimmer {
@@ -61,4 +67,26 @@ a {
 .blur-img.loaded {
   animation: none;
   background: none;
+  filter: blur(0px);
+  transform: scale(1);
+}
+
+/* Snap scrolling for Reels */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-item {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }

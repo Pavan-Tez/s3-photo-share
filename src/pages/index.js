@@ -1,21 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 
-export default function Home() {
-  const [files, setFiles] = useState([]);
-  const prefix = "photos/";
-  const [downloading, setDownloading] = useState(false);
-  useEffect(() => {
-    fetch(`/api/images?prefix=${prefix}`)
-      .then(res => res.json())
-      .then(setFiles);
-  }, []);
+const PREFIX = "photos/"; // Constant, moved outside component
 
-    const btn = {
+const btn = {
   padding: "10px 16px",
   cursor: "pointer",
   marginRIght: 30,
 };
+
+export default function Home() {
+  const [files, setFiles] = useState([]);
+  const [downloading, setDownloading] = useState(false);
+  
+  // Memoize encoded prefix to avoid recomputation
+  const encodedPrefix = useMemo(() => encodeURIComponent(PREFIX), []);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    fetch(`/api/images?prefix=${encodedPrefix}`, {
+      signal: abortController.signal,
+    })
+      .then(res => {
+        if (res.status === 304) {
+          return null; // Use cached data
+        }
+        return res.ok ? res.json() : [];
+      })
+      .then(data => {
+        if (!abortController.signal.aborted && data !== null) {
+          const fileList = Array.isArray(data) ? data : (data.files || []);
+          setFiles(fileList);
+        }
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error("Error fetching images:", err);
+          setFiles([]);
+        }
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [encodedPrefix]); // Only depend on encodedPrefix, not the constant
 
   return (
     <main style={{ padding: 20 }}>
@@ -48,7 +77,7 @@ export default function Home() {
       <br /><br />
 
       {/* VIEW GALLERY */}
-      <Link href={`/gallery?prefix=${prefix}`}>
+      <Link href={`/gallery?prefix=${PREFIX}`}>
         <button style={{ padding: "10px 16px", cursor: "pointer" }}>
           👀 View Gallery
         </button>

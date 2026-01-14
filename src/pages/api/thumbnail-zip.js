@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     multiples: true,
 
     // 🔥 IMPORTANT LIMITS
-    maxTotalFileSize: 5 * 1024 * 1024 * 1024, // 5 GB total
-    maxFileSize: 50 * 1024 * 1024,            // 50 MB per file
+    maxTotalFileSize: 0.5 * 1024 * 1024 * 1024, // 0.5 GB total
+    maxFileSize: 5 * 1024 * 1024,            // 5 MB per file
   });
 
   form.parse(req, async (err, fields, files) => {

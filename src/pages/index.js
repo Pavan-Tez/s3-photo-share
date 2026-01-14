@@ -63,9 +63,6 @@ export default function Home() {
 
   return (
     <main style={{ padding: 20 }}>
-      <h2>Photo Albums</h2>
-      <br />
-
       <div
         style={{
           border: "1px solid #333",
@@ -80,7 +77,10 @@ export default function Home() {
             Thumbnail Converter →
           </button>
         </Link>
+        <h6>Entries only below 100mb (free server, can't more than that)</h6>
       </div>
+      <h2>Photo Albums</h2>
+      <br />
 
       {albums.map((album) => {
         const status = albumStatus[album.prefix] || {};

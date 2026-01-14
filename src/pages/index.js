@@ -105,31 +105,21 @@ export default function Home() {
             </div>
 
             {/* VIEW GALLERY */}
-            <Link
+            <a
               href={
                 disabled ? "#" : `/gallery?prefix=${album.prefix}`
               }
+               style={{
+                padding: "8px 12px",
+                border: "1px solid #ccc",
+                borderRadius: 6,
+                textDecoration: "none",
+                display: "inline-block",
+                cursor: disabled ? "not-allowed" : "pointer",
+              }}
             >
-              <button
-                disabled={disabled}
-                style={{
-                  padding: "8px 12px",
-                  marginRight: 10,
-                  cursor: disabled ? "not-allowed" : "pointer",
-                }}
-                // title={
-                //   status.loading
-                //     ? "Checking album..."
-                //     : status.error
-                //     ? "Album unavailable"
-                //     : !status.hasImages
-                //     ? "No images found"
-                //     : ""
-                // }
-              >
                 👀 View Gallery
-              </button>
-            </Link>
+            </a>
 
             {/* DOWNLOAD ZIP */}
             <a

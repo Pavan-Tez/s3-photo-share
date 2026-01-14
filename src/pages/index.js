@@ -72,11 +72,15 @@ export default function Home() {
           maxWidth: 400,
         }}
       >
-        <Link href="/convertLocalThumbs">
-          <button style={{ padding: "10px 16px", cursor: "pointer" }}>
+        <a href="/convertLocalThumbs" style={{
+                padding: "8px 12px",
+                border: "1px solid #ccc",
+                borderRadius: 6,
+                textDecoration: "none",
+                display: "inline-block",
+              }}>
             Thumbnail Converter →
-          </button>
-        </Link>
+        </a>
         <h6>Entries only below 100mb (free server, can't more than that)</h6>
       </div>
       <h2>Photo Albums</h2>
@@ -116,6 +120,7 @@ export default function Home() {
                 textDecoration: "none",
                 display: "inline-block",
                 cursor: disabled ? "not-allowed" : "pointer",
+                marginRight:10
               }}
             >
                 👀 View Gallery

@@ -76,17 +76,8 @@ const showNext = () => {
     <main style={{ padding: 20 }}>
       <h2>Gallery</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          // gap: 12,
-          justifyItems:"center",
-          margin:20
-          // padding:12,
-          
-        }}
-      >
+      <div className="gallery-grid">
+
 {files.slice(0, visibleCount).map((file, idx) => (
   <img
     key={file.name}
@@ -105,16 +96,13 @@ const showNext = () => {
     }}
     onClick={() => openLightbox(idx)}
     style={{
-      width: "250px",
-      height: "180px",
+      width: "100%",
+      aspectRatio: "4 / 3",
       objectFit: "cover",
-      // borderRadius: 8,
       cursor: "pointer",
-      display:"block",
-       background: "#000",
-      outline: "10px solid #000"
-      
+      background: "#000",
     }}
+
   />
 ))}
 

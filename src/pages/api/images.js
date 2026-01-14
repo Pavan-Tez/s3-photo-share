@@ -10,7 +10,7 @@ const s3 = new AWS.S3({
 
 export default async function handler(req, res) {
   try {
-    const prefix = "beachphotos/"; // root folder
+    const { prefix  = ""} = req.query; // root folder
 
     const data = await s3.listObjectsV2({
       Bucket: process.env.S3_BUCKET_NAME,

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 
-const PAGE_SIZE = 40;
+const PAGE_SIZE = 50;
 
 export default function Gallery() {
   const router = useRouter();

@@ -12,11 +12,17 @@ const s3 = new AWS.S3({
 let cachedZipKey = null;
 
 export default async function handler(req, res) {
+  const { prefix } = req.query;
+
+if (!prefix) {
+  return res.status(400).send("Prefix is required");
+}
+
   try {
     if (!cachedZipKey) {
       const data = await s3.listObjectsV2({
         Bucket: process.env.S3_BUCKET_NAME,
-        Prefix: "",
+        Prefix: prefix,
       }).promise();
 
       const zip = data.Contents?.find(o =>

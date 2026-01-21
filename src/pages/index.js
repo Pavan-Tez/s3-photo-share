@@ -12,10 +12,6 @@ const albums = [
     prefix: process.env.NEXT_PUBLIC_S3_BHOGI_PREFIX,
     date: "14 Jan 2026",
   },
-  {
-    name: "Family",
-    prefix: "family/",
-  },
 ];
 
 export default function Home() {
@@ -86,6 +82,36 @@ export default function Home() {
       <h2>Photo Albums</h2>
       <br />
 
+      <div
+            
+            style={{
+              border: "1px solid #333",
+              borderRadius: 8,
+              padding: 16,
+              marginBottom: 20,
+              maxWidth: 400,
+              opacity:1,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" ,marginBottom:5}}>
+              <h3>Family</h3>
+            </div>
+          
+            <a
+              href="/components/family"
+               style={{
+                padding: "8px 12px",
+                border: "1px solid #ccc",
+                borderRadius: 6,
+                textDecoration: "none",
+                display: "inline-block",
+                cursor: "pointer",
+                marginRight:10
+              }}
+            >
+                👀 View Gallery
+            </a>
+            </div>
       {albums.map((album) => {
         const status = albumStatus[album.prefix] || {};
         const disabled =
@@ -103,7 +129,7 @@ export default function Home() {
               opacity: disabled ? 0.6 : 1,
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" ,marginBottom:5}}>
               <h3>{album.name}</h3>
               <h6>{album.date}</h6>
             </div>
@@ -148,15 +174,6 @@ export default function Home() {
                 display: "inline-block",
                 cursor: disabled ? "not-allowed" : "pointer",
               }}
-              // title={
-              //   status.loading
-              //     ? "Checking album..."
-              //     : status.error
-              //     ? "Album unavailable"
-              //     : !status.hasImages
-              //     ? "No images found"
-              //     : ""
-              // }
             >
               {downloading === album.prefix
                 ? "Preparing..."

@@ -37,7 +37,11 @@ export default function Gallery() {
   /* ------------------ LIGHTBOX ------------------ */
 
   const openLightbox = (index) => {
-    if (!isDesktop()) return; // 🚫 mobile: no lightbox
+    const file = files[index];
+
+    // ❌ block ONLY videos on mobile
+    if (isVideo(file) && !isDesktop()) return;
+
     setIsImageLoading(true);
     setLightboxIndex(index);
   };
@@ -176,7 +180,7 @@ export default function Gallery() {
       {/* Infinite scroll trigger */}
       <div ref={loaderRef} style={{ height: 40 }} />
 
-      {/* LIGHTBOX (DESKTOP ONLY) */}
+      {/* LIGHTBOX */}
       {lightboxIndex !== null && (
         <div
           onClick={closeLightbox}

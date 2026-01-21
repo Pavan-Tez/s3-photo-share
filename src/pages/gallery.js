@@ -3,41 +3,44 @@ import { useRouter } from "next/router";
 
 const PAGE_SIZE = 50;
 
-// 🔎 Detect video files
+/* ------------------ HELPERS ------------------ */
+
+// Detect video files
 const isVideo = (file) =>
   file?.name?.match(/\.(mp4|webm|ogg|mov)$/i);
 
-// 🧠 Image preloader (browser-cache friendly)
+// Desktop detection (mouse / trackpad)
+const isDesktop = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(pointer: fine)").matches;
+
+// Image preloader
 const preloadImage = (url) => {
   if (!url) return;
   const img = new Image();
   img.src = url;
 };
 
+/* ------------------ COMPONENT ------------------ */
+
 export default function Gallery() {
   const router = useRouter();
   const { prefix } = router.query;
-  const videoRef = useRef(null);
+
+  const loaderRef = useRef(null);
 
   const [files, setFiles] = useState([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const loaderRef = useRef(null);
-
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
 
-  /* ------------------ LIGHTBOX CONTROLS ------------------ */
+  /* ------------------ LIGHTBOX ------------------ */
 
   const openLightbox = (index) => {
+    if (!isDesktop()) return; // 🚫 mobile: no lightbox
     setIsImageLoading(true);
     setLightboxIndex(index);
-    requestAnimationFrame(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = false;
-      videoRef.current.play().catch(() => {});
-    }
-  });
-};
+  };
 
   const closeLightbox = () => {
     setLightboxIndex(null);
@@ -65,35 +68,33 @@ export default function Gallery() {
       .then(setFiles);
   }, [router.isReady, prefix]);
 
-  /* ------------------ PRELOAD FULL IMAGE ON LIGHTBOX OPEN ------------------ */
+  /* ------------------ PRELOAD FULL IMAGE ------------------ */
 
-useEffect(() => {
-  if (lightboxIndex === null) return;
+  useEffect(() => {
+    if (lightboxIndex === null) return;
 
-  const file = files[lightboxIndex];
-  if (!file || isVideo(file)) {
-    setIsImageLoading(false);
-    return;
-  }
+    const file = files[lightboxIndex];
+    if (!file || isVideo(file)) {
+      setIsImageLoading(false);
+      return;
+    }
 
-  const img = new Image();
-  img.src = file.fullUrl;
+    const img = new Image();
+    img.src = file.fullUrl;
 
-  // ✅ If already cached
-  if (img.complete) {
-    setIsImageLoading(false);
-  } else {
-    img.onload = () => setIsImageLoading(false);
-    img.onerror = () => setIsImageLoading(false);
-  }
+    if (img.complete) {
+      setIsImageLoading(false);
+    } else {
+      img.onload = () => setIsImageLoading(false);
+      img.onerror = () => setIsImageLoading(false);
+    }
 
-  // 🔥 Preload next & previous images
-  const next = files[lightboxIndex + 1];
-  const prev = files[lightboxIndex - 1];
+    const next = files[lightboxIndex + 1];
+    const prev = files[lightboxIndex - 1];
 
-  if (next && !isVideo(next)) preloadImage(next.fullUrl);
-  if (prev && !isVideo(prev)) preloadImage(prev.fullUrl);
-}, [lightboxIndex, files]);
+    if (next && !isVideo(next)) preloadImage(next.fullUrl);
+    if (prev && !isVideo(prev)) preloadImage(prev.fullUrl);
+  }, [lightboxIndex, files]);
 
   /* ------------------ INFINITE SCROLL ------------------ */
 
@@ -127,24 +128,26 @@ useEffect(() => {
           const video = isVideo(file);
 
           return video ? (
-            // 🎞️ GRID VIDEO — DO NOT PLAY
+            // 🎞️ GRID VIDEO
             <video
               key={file.name}
               src={file.fullUrl}
-              ref={videoRef}
-              preload="auto"
-              // playsInline
-              onClick={() => openLightbox(idx)}
+              preload="metadata"
+              controls={!isDesktop()}
+              playsInline
+              onClick={() => {
+                if (isDesktop()) openLightbox(idx);
+              }}
               style={{
                 width: "100%",
                 aspectRatio: "4 / 3",
                 objectFit: "cover",
-                cursor: "pointer",
+                cursor: isDesktop() ? "pointer" : "default",
                 background: "#000",
               }}
             />
           ) : (
-            // 🖼️ GRID IMAGE (thumb + background preload)
+            // 🖼️ GRID IMAGE
             <img
               key={file.name}
               src={file.thumbUrl || file.fullUrl}
@@ -152,7 +155,6 @@ useEffect(() => {
               loading="lazy"
               decoding="async"
               className="blur-img"
-              // onLoad={() => preloadImage(file.fullUrl)} // 🔥 PARALLEL PRELOAD
               onError={(e) => {
                 if (e.currentTarget.src !== file.fullUrl) {
                   e.currentTarget.src = file.fullUrl;
@@ -174,7 +176,7 @@ useEffect(() => {
       {/* Infinite scroll trigger */}
       <div ref={loaderRef} style={{ height: 40 }} />
 
-      {/* LIGHTBOX */}
+      {/* LIGHTBOX (DESKTOP ONLY) */}
       {lightboxIndex !== null && (
         <div
           onClick={closeLightbox}
@@ -207,7 +209,6 @@ useEffect(() => {
                     <video
                       src={file.fullUrl}
                       controls
-                      autoPlay
                       playsInline
                       style={{
                         maxWidth: "100%",

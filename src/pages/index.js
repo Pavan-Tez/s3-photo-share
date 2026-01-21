@@ -16,11 +16,8 @@ const albums = [
 
 export default function Home() {
   const [downloading, setDownloading] = useState(null);
-
-  // NEW: album status map
   const [albumStatus, setAlbumStatus] = useState({});
 
-  // NEW: check albums on load
   useEffect(() => {
     albums.forEach(async (album) => {
       try {
@@ -44,11 +41,10 @@ export default function Home() {
             hasImages: data.length > 0,
           },
         }));
-      } catch (err) {
+      } catch {
         setAlbumStatus((prev) => ({
           ...prev,
           [album.prefix]: {
-
             error: true,
             hasImages: false,
           },
@@ -58,143 +54,156 @@ export default function Home() {
   }, []);
 
   return (
-    <main style={{ padding: 20 }}>
-      <div
-        style={{
-          border: "1px solid #333",
-          borderRadius: 8,
-          padding: 16,
-          marginBottom: 20,
-          maxWidth: 400,
-        }}
-      >
-        <a href="/convertLocalThumbs" style={{
-                padding: "8px 12px",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                textDecoration: "none",
-                display: "inline-block",
-              }}>
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        padding: 20,
+      }}
+    >
+      {/* PAGE CONTAINER */}
+      <div style={{ width: "100%", maxWidth: 420 }}>
+        {/* THUMBNAIL TOOL */}
+        <div
+          style={{
+            border: "1px solid #333",
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 20,
+          }}
+        >
+          <a
+            href="/convertLocalThumbs"
+            style={{
+              padding: "8px 12px",
+              border: "1px solid #ccc",
+              borderRadius: 6,
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
             Thumbnail Converter →
-        </a>
-        <h6>Entries only below 100mb (free server, can't more than that)</h6>
-      </div>
-      <h2>Photo Albums</h2>
-      <br />
+          </a>
+          <h6 style={{ marginTop: 8, color: "#aaa" }}>
+            Entries only below 100mb (free server)
+          </h6>
+        </div>
 
-      <div
-            
+        <h2>Photo Albums</h2>
+        <br />
+
+        {/* FAMILY CARD */}
+        <div
+          style={{
+            border: "1px solid #333",
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 20,
+          }}
+        >
+          <h3>Family</h3>
+
+          <a
+            href="/components/family"
             style={{
-              border: "1px solid #333",
-              borderRadius: 8,
-              padding: 16,
-              marginBottom: 20,
-              maxWidth: 400,
-              opacity:1,
+              padding: "8px 12px",
+              border: "1px solid #ccc",
+              borderRadius: 6,
+              textDecoration: "none",
+              display: "inline-block",
+              cursor: "pointer",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between" ,marginBottom:5}}>
-              <h3>Family</h3>
-            </div>
-          
-            <a
-              href="/components/family"
-               style={{
-                padding: "8px 12px",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                textDecoration: "none",
-                display: "inline-block",
-                cursor: "pointer",
-                marginRight:10
-              }}
-            >
-                👀 View Gallery
-            </a>
-            </div>
-      {albums.map((album) => {
-        const status = albumStatus[album.prefix] || {};
-        const disabled =
-          !status.hasImages;
+            👀 View Gallery
+          </a>
+        </div>
 
-        return (
-          <div
-            key={album.prefix}
-            style={{
-              border: "1px solid #333",
-              borderRadius: 8,
-              padding: 16,
-              marginBottom: 20,
-              maxWidth: 400,
-              opacity: disabled ? 0.6 : 1,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between" ,marginBottom:5}}>
-              <h3>{album.name}</h3>
-              <h6>{album.date}</h6>
-            </div>
+        {/* OTHER ALBUMS */}
+        {albums.map((album) => {
+          const status = albumStatus[album.prefix] || {};
+          const disabled = !status.hasImages;
 
-            {/* VIEW GALLERY */}
-            <a
-              href={
-                disabled ? "#" : `/gallery?prefix=${album.prefix}`
-              }
-               style={{
-                padding: "8px 12px",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                textDecoration: "none",
-                display: "inline-block",
-                cursor: disabled ? "not-allowed" : "pointer",
-                marginRight:10
-              }}
-            >
-                👀 View Gallery
-            </a>
-
-            {/* DOWNLOAD ZIP */}
-            <a
-              href={
-                disabled
-                  ? undefined
-                  : `/api/download-zip?prefix=${album.prefix}`
-              }
-              onClick={(e) => {
-                if (disabled) {
-                  e.preventDefault();
-                  return;
-                }
-                setDownloading(album.prefix);
-              }}
+          return (
+            <div
+              key={album.prefix}
               style={{
-                padding: "8px 12px",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                textDecoration: "none",
-                display: "inline-block",
-                cursor: disabled ? "not-allowed" : "pointer",
+                border: "1px solid #333",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 20,
+                opacity: disabled ? 0.6 : 1,
               }}
             >
-              {downloading === album.prefix
-                ? "Preparing..."
-                : "⬇ Download ZIP"}
-            </a>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 6,
+                }}
+              >
+                <h3>{album.name}</h3>
+                <h6>{album.date}</h6>
+              </div>
 
-            {/* STATUS MESSAGE */}
-            {!status.loading && status.error && (
-              <p style={{ color: "red", fontSize: 12 }}>
-                Album not accessible
-              </p>
-            )}
+              <a
+                href={disabled ? "#" : `/gallery?prefix=${album.prefix}`}
+                onClick={(e) => disabled && e.preventDefault()}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #ccc",
+                  borderRadius: 6,
+                  textDecoration: "none",
+                  display: "inline-block",
+                  marginRight: 10,
+                  cursor: disabled ? "not-allowed" : "pointer",
+                }}
+              >
+                👀 View Gallery
+              </a>
 
-            {!status.loading && !status.error && !status.hasImages && (
-              <p style={{ color: "#777", fontSize: 12 }}>
-                No images in this album
-              </p>
-            )}
-          </div>
-        );
-      })}
+              <a
+                href={
+                  disabled
+                    ? undefined
+                    : `/api/download-zip?prefix=${album.prefix}`
+                }
+                onClick={(e) => {
+                  if (disabled) {
+                    e.preventDefault();
+                    return;
+                  }
+                  setDownloading(album.prefix);
+                }}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #ccc",
+                  borderRadius: 6,
+                  textDecoration: "none",
+                  display: "inline-block",
+                  cursor: disabled ? "not-allowed" : "pointer",
+                }}
+              >
+                {downloading === album.prefix
+                  ? "Preparing..."
+                  : "⬇ Download ZIP"}
+              </a>
+
+              {!status.loading && status.error && (
+                <p style={{ color: "#ff6b6b", fontSize: 12 }}>
+                  Album not accessible
+                </p>
+              )}
+
+              {!status.loading && !status.error && !status.hasImages && (
+                <p style={{ color: "#777", fontSize: 12 }}>
+                  No images in this album
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </main>
   );
 }

@@ -275,6 +275,7 @@ export default function Gallery() {
                 href={`/api/download-image?url=${encodeURIComponent(
                   files[lightboxIndex].fullUrl
                 )}&name=${files[lightboxIndex].name}`}
+                style={{ color: "white" }}
               >
                 ⬇ Download
               </a>
